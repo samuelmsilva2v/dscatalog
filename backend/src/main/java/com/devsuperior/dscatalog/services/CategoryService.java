@@ -5,12 +5,15 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.mapping.AccessOptions.SetOptions.Propagation;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.devsuperior.dscatalog.dtos.CategoryDto;
 import com.devsuperior.dscatalog.entities.Category;
 import com.devsuperior.dscatalog.repositories.CategoryRepository;
+import com.devsuperior.dscatalog.services.exceptions.DatabaseException;
 import com.devsuperior.dscatalog.services.exceptions.ResourceNotFoundException;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -50,15 +53,29 @@ public class CategoryService {
 
 	@Transactional
 	public CategoryDto update(Long id, CategoryDto dto) {
-		
+
 		try {
 			var entity = categoryRepository.getReferenceById(id);
 			entity.setName(dto.getName());
 			entity = categoryRepository.save(entity);
 			return new CategoryDto(entity);
-		} 
-		catch (EntityNotFoundException e) {
+		} catch (EntityNotFoundException e) {
 			throw new ResourceNotFoundException("Id " + id + " not found");
+		}
+	}
+
+	@Transactional
+	public void delete(Long id) {
+		
+		if (!categoryRepository.existsById(id)) {
+			throw new ResourceNotFoundException("Resource not found");
+		}
+		
+		try {
+			categoryRepository.deleteById(id);
+		} 
+		catch (DataIntegrityViolationException e) {
+			throw new DatabaseException("Integrity violation");
 		}
 	}
 }
