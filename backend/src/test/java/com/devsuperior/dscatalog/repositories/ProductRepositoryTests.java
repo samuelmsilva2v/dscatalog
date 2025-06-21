@@ -11,6 +11,10 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import com.devsuperior.dscatalog.entities.Product;
 import com.devsuperior.dscatalog.tests.Factory;
 
+/*
+ * Carrega somente os componentes relacionados ao Spring Data JPA,
+ * cada teste é transacional e dá rollback ao final. (teste de unidade: repository)
+ */
 @DataJpaTest
 public class ProductRepositoryTests {
 	
@@ -24,6 +28,9 @@ public class ProductRepositoryTests {
 	@BeforeEach
 	void setUp() throws Exception {
 		
+		/*
+		 * Dados conhecidos do seed do banco de dados
+		 */
 		existingId = 1L;
 		nonExistingId = 100L;
 		countTotalProducts = 25L;

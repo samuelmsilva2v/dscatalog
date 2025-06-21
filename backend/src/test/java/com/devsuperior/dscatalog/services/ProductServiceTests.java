@@ -1,5 +1,4 @@
 package com.devsuperior.dscatalog.services;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,14 +12,26 @@ import com.devsuperior.dscatalog.repositories.ProductRepository;
 import com.devsuperior.dscatalog.services.exceptions.DatabaseException;
 import com.devsuperior.dscatalog.services.exceptions.ResourceNotFoundException;
 
-@ExtendWith(SpringExtension.class)
+/*
+ * Não carrega o contexto, mas permite usar os
+ * recursos do Spring com JUnit (teste de unidade: service/component)
+ */
+@ExtendWith(SpringExtension.class) 
 public class ProductServiceTests {
 
-	@InjectMocks
-	private ProductService productService;
+	/*
+	 * Injetar automaticamente os mocks anotados
+	 * dentro do objeto real que está sendo testado
+	 */
+	@InjectMocks 
+	private ProductService productService; // Classe real
 	
+	/*
+	 * Simula o comportamento da dependência
+	 * para controle nos testes
+	 */
 	@Mock
-	private ProductRepository productRepository;
+	private ProductRepository productRepository; // Dependência simulada
 	
 	private long existingId;
 	private long nonExistingId;
@@ -29,12 +40,21 @@ public class ProductServiceTests {
 	@BeforeEach
 	void setUp() throws Exception {
 		
+		/*
+		 * IDs simulados para os diferentes cenários de teste
+		 */
 		existingId = 1L;
 		nonExistingId = 2L;
 		dependentId = 3L;
 		
+		/*
+		 * Simula exceção de integridade referencial ao tentar deletar um "dependentId"
+		 */
 		Mockito.doThrow(DatabaseException.class).when(productRepository).deleteById(dependentId);
 		
+		/*
+		 * Configura o comportamento do existsById para cada cenário 
+		 */
 		Mockito.when(productRepository.existsById(existingId)).thenReturn(true);
 		Mockito.when(productRepository.existsById(nonExistingId)).thenReturn(false);
 		Mockito.when(productRepository.existsById(dependentId)).thenReturn(true);
