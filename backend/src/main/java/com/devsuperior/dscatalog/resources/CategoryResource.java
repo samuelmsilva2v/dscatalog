@@ -28,7 +28,7 @@ public class CategoryResource {
     @GetMapping(value = "/{id}")
     public ResponseEntity<CategoryDto> findById(@PathVariable Long id) {
         CategoryDto dto = service.findById(id);
-        return ResponseEntity.ok().body(dto);
+        return ResponseEntity.ok(dto);
     }
 
     @PostMapping
@@ -37,6 +37,12 @@ public class CategoryResource {
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(dto.getId()).toUri();
         return ResponseEntity.created(uri).body(dto);
+    }
+
+    @PutMapping(value = "{id}")
+    public ResponseEntity<CategoryDto> update(@PathVariable Long id, @RequestBody CategoryDto dto) {
+        dto = service.update(id, dto);
+        return ResponseEntity.ok(dto);
     }
 
 }
