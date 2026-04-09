@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.Instant;
 import java.util.Objects;
 
 @Entity
@@ -20,6 +21,25 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+
+    @Column(columnDefinition = "TIMESTAMP WITHOUT TIMEZONE")
+    private Instant createdAt;
+
+    @Column(columnDefinition = "TIMESTAMP WITHOUT TIMEZONE")
+    private Instant updatedAt;
+
+    @PrePersist
+    public void prePersist()
+    {
+        createdAt = Instant.now();
+    }
+
+    @PreUpdate
+    public void preUpdate()
+    {
+        updatedAt = Instant.now();
+    }
+
 
     @Override
     public boolean equals(Object o) {
