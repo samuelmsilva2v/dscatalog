@@ -28,6 +28,12 @@ public class Category {
     @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private Instant updatedAt;
 
+    public Category(long l, String electronics) {
+    }
+
+    public Category(Category category) {
+    }
+
     @PrePersist
     public void prePersist()
     {
