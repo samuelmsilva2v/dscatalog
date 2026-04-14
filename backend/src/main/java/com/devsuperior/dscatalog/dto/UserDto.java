@@ -1,6 +1,8 @@
 package com.devsuperior.dscatalog.dto;
 
 import com.devsuperior.dscatalog.entities.User;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,8 +16,14 @@ import java.util.Set;
 public class UserDto {
 
     private Long id;
+
+    @NotBlank(message = "Campo obrigatório")
     private String firstName;
+
+    @NotBlank(message = "Campo obrigatório")
     private String lastName;
+
+    @Email(message = "E-mail inválido")
     private String email;
 
     Set<RoleDto> roles = new HashSet<>();

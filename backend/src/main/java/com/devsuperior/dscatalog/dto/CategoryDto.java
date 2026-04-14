@@ -1,6 +1,7 @@
 package com.devsuperior.dscatalog.dto;
 
 import com.devsuperior.dscatalog.entities.Category;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @NoArgsConstructor
@@ -9,6 +10,7 @@ import lombok.*;
 @Setter
 public class CategoryDto {
 
+    @NotBlank(message = "Campo obrigatório")
     private Long id;
     private String name;
 
