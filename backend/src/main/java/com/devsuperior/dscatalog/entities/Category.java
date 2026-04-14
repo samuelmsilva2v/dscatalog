@@ -7,7 +7,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "tb_category")
@@ -27,6 +29,9 @@ public class Category {
 
     @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private Instant updatedAt;
+
+    @ManyToMany(mappedBy = "categories")
+    private Set<Product> products = new HashSet<>();
 
     public Category(long l, String electronics) {
     }
