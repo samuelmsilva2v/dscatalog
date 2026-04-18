@@ -3,37 +3,38 @@ package com.devsuperior.dscatalog.resources;
 import com.devsuperior.dscatalog.dto.ProductDto;
 import com.devsuperior.dscatalog.resources.exceptions.ResourceExceptionHandler;
 import com.devsuperior.dscatalog.services.ProductService;
-import com.devsuperior.dscatalog.services.exceptions.DatabaseException;
 import com.devsuperior.dscatalog.services.exceptions.ResourceNotFoundException;
 import com.devsuperior.dscatalog.tests.Factory;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import tools.jackson.databind.ObjectMapper;
-
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(ProductResource.class)
 @Import(ResourceExceptionHandler.class)
+@WithMockUser(roles = {"ADMIN"})
 public class ProductResourceTests {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockitoBean
+    @MockBean
     private ProductService service;
 
     @Autowired
@@ -53,9 +54,6 @@ public class ProductResourceTests {
         productDto = Factory.createProductDto();
         page = new PageImpl<>(List.of(new ProductDto()));
 
-
-//        doThrow(DatabaseException.class).when(service).delete(dependentId);
-
     }
 
     @Test
@@ -65,6 +63,7 @@ public class ProductResourceTests {
         String jsonBody = mapper.writeValueAsString(productDto);
 
         ResultActions result = mockMvc.perform(post("/products").content(jsonBody)
+                .with(csrf())
                 .contentType("application/json").accept("application/json"));
 
         result.andExpect(status().isCreated());
@@ -77,7 +76,8 @@ public class ProductResourceTests {
     public void deleteShouldThrowResourceNotFoundExceptionWhenIdDoesNotExist() throws Exception {
         doThrow(ResourceNotFoundException.class).when(service).delete(nonExistingId);
 
-        ResultActions result = mockMvc.perform((delete("/products/{id}", nonExistingId).accept("application/json")));
+        ResultActions result = mockMvc.perform(delete("/products/{id}", nonExistingId)
+                .with(csrf()).accept("application/json"));
         result.andExpect(status().isNotFound());
     }
 
@@ -86,7 +86,8 @@ public class ProductResourceTests {
     public void deleteShouldReturnNoContentWhenIdExists() throws Exception {
         doNothing().when(service).delete(existingId);
 
-        ResultActions result = mockMvc.perform((delete("/products/{id}", existingId).accept("application/json")));
+        ResultActions result = mockMvc.perform(delete("/products/{id}", existingId)
+                .with(csrf()).accept("application/json"));
         result.andExpect(status().isNoContent());
     }
 
@@ -97,6 +98,7 @@ public class ProductResourceTests {
         String jsonBody = mapper.writeValueAsString(productDto);
 
         ResultActions result = mockMvc.perform(put("/products/{id}", existingId).content(jsonBody)
+                .with(csrf())
                 .contentType("application/json").accept("application/json"));
 
         result.andExpect(status().isOk());
@@ -105,8 +107,6 @@ public class ProductResourceTests {
         result.andExpect(jsonPath("$.description").exists());
     }
 
-
-
     @Test
     public void updateShouldReturnProductDtoWhenIdDoesNotExists() throws Exception {
         when(service.update(eq(nonExistingId), any())).thenThrow(ResourceNotFoundException.class);
@@ -114,6 +114,7 @@ public class ProductResourceTests {
         String jsonBody = mapper.writeValueAsString(productDto);
 
         ResultActions result = mockMvc.perform(put("/products/{id}", nonExistingId).content(jsonBody)
+                .with(csrf())
                 .contentType("application/json").accept("application/json"));
 
         result.andExpect(status().isNotFound());
