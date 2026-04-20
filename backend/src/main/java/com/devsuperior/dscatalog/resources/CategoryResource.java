@@ -3,8 +3,6 @@ package com.devsuperior.dscatalog.resources;
 import com.devsuperior.dscatalog.dto.CategoryDto;
 import com.devsuperior.dscatalog.services.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -21,9 +19,9 @@ public class CategoryResource {
     private CategoryService service;
 
     @GetMapping
-    public ResponseEntity<List<CategoryDto>> findAll (Pageable pageable) {
-        Page<CategoryDto> categories = service.findAllPaged(pageable);
-        return ResponseEntity.ok(categories.getContent());
+    public ResponseEntity<List<CategoryDto>> findAll () {
+        List<CategoryDto> categories = service.findAll();
+        return ResponseEntity.ok().body(categories);
     }
 
     @GetMapping(value = "/{id}")

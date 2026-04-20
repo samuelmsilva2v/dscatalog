@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequestMapping(value = "/products")
@@ -22,9 +21,12 @@ public class ProductResource {
     private ProductService service;
 
     @GetMapping
-    public ResponseEntity<List<ProductDto>> findAll (Pageable pageable) {
-        Page<ProductDto> products = service.findAllPaged(pageable);
-        return ResponseEntity.ok(products.getContent());
+    public ResponseEntity<Page<ProductDto>> findAll(
+            @RequestParam(value = "name", defaultValue = "") String name,
+            @RequestParam(value = "categoryId", defaultValue = "0") String categoryId,
+            Pageable pageable) {
+        Page<ProductDto> products = service.findAllPaged(name, categoryId, pageable);
+        return ResponseEntity.ok().body(products);
     }
 
     @GetMapping(value = "/{id}")
